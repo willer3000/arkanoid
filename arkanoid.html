@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <header accesscontrol-allow-origin='*'></header>
+    <style>
+        body{
+            background-color: black;
+            overflow-x: hidden;
+            margin-top: 0;
+        }
+        canvas { 
+            border: 1px solid white; 
+            border-radius: 2%;
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            background-color: rgba(30, 36, 30, 0.9);
+        }    
+    </style>
+</head>
+<body>
+    <script type='text/javascript'>
+        document.write('<canvas id="tela" width="800" height="600"></canvas>');
+
+        /*Sprites*/
+        var image = new Image();
+            image.src = 'dino_walk_1.png';
+        var image2 = new Image();
+            image2.src = 'dino_walk_2.png';
+
+        class Input {
+            constructor(owner){
+                this.keys = new Array();
+                this.owner = owner;
+                document.addEventListener("keydown", (event) => {
+                    if(event.key == "Enter"){
+
+                        document.getElementById("tela").requestFullscreen()
+                    }
+                    if (this.owner[event.code] && typeof( this.owner[event.code]) == "function" ){
+                        this.owner[event.code]()
+                    }
+                    this.keys[event.code] = true
+                })
+
+                document.addEventListener("keyup", (event) => {
+                    this.keys[event.code] = false
+                })
+
+                /*
+                    Quando o navegador perde o foco com teclas pressionadas, ao retornar o foco, limpa a lista de teclas pressionadas
+                */
+                window.onfocus = function() {
+                    for (var key in this.keys) {
+                        this.keys[key] = false
+                    }
+                }.bind(this)
+                document.addEventListener("onfocus", (event) => {
+                    //alert("saiu")
+                    array.forEach(this.keys, (key)=> {
+                        key = false
+                    });
+                })
+            }
+            getKeys = function(){
+                return this.keys
+            }
+        }        
+
+
+        class Arkanoid{
+            constructor (canvasContext){
+                this.keys = []
+                this.ctx = canvasContext
+                this.ball = {x: 10, y: 20, vdir: 1, hdir: 1, velocity: 3}
+                this.obj = {x: 10, y: 580, width: 60}
+                this.input = new Input(this)
+                this.frame = 0
+            }
+            
+            run(){
+                setInterval(this.processAll.bind(this), 10)
+                setInterval(this.incFrame.bind(this), 150)
+                requestAnimationFrame(this.draw.bind(this))
+            }
+
+            processAll(){
+                if(this.input.getKeys()['ArrowLeft']){
+                    if (this.obj.x > 0){
+                        this.obj.x-=5
+                    }
+                }
+                if(this.input.getKeys()['ArrowRight']){
+                    if (this.obj.x < 800-this.obj.width){
+                        this.obj.x+=5
+                    }
+                }
+                this.ball.x += this.ball.vdir*this.ball.velocity
+                this.ball.y += this.ball.hdir*this.ball.velocity
+                if (this.ball.x <= 0){
+                    this.ball.vdir *= -1
+                }
+                if (this.ball.y <= 0){
+                    this.ball.hdir *= -1
+                }
+                if (this.ball.x >= 800){
+                    this.ball.vdir *= -1
+                }
+                if (this.ball.y >= 600){
+                    this.ball.hdir *= -1
+                }
+            }
+
+            incFrame(){
+                if (this.input.getKeys()['ArrowLeft'] || this.input.getKeys()['ArrowRight']){
+                    this.frame ++
+                    if (this.frame > 5){
+                        this.frame = 0
+                    }
+                }
+                else{
+                    this.frame = 3
+                }
+            }
+
+            draw(timeStamp){
+                this.ctx.clearRect(0,0,800,600)
+                this.ctx.fillStyle = "white"
+                this.ctx.fillRect(this.obj.x, this.obj.y-37, this.obj.width, 10)
+
+                this.ctx.beginPath()
+                this.ctx.arc(this.ball.x, this.ball.y, 10, 0, 2 * Math.PI )
+                this.ctx.fill();
+                var width = 134
+                //var frame = 3
+                //this.ctx.drawImage(image, this.frame*width, 0, this.frame*width+width, width, 0, 0, 134, 134, 134, 134)
+                this.ctx.save();
+                //this.ctx.scale(1, -1);
+                //this.ctx.drawImage(img, 0, -img.height);
+                if (this.input.getKeys()['ArrowLeft'])
+                {
+                    this.ctx.drawImage(image2, this.frame*width, 0, width, width, this.obj.x, this.obj.y-(37), width/2, width/2, width/2, width/2)
+                }
+                else
+                {
+                    this.ctx.drawImage(image, this.frame*width, 0, width, width, this.obj.x, this.obj.y-(37), width/2, width/2, width/2, width/2)
+                }
+                //this.ctx.drawImage(image, this.frame*width, 0, width, width, this.obj.x, this.obj.y-(37), width/2, width/2, width/2, width/2)
+
+                this.ctx.restore();                
+                //this.ctx.drawImage(image, this.frame*width, 0, width, width, this.obj.x, this.obj.y-(37), width/2, width/2, width/2, width/2)
+                //console.log(this.frame*width)
+
+                requestAnimationFrame(this.draw.bind(this))
+            }
+        }
+        var game = new Arkanoid(document.getElementById('tela').getContext("2d"))
+        game.run();
+    </script>    
+</body>
+</html>
