@@ -7,19 +7,21 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <style>
         body{
-            background-color: black;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.603), rgb(2, 68, 65)); 
             overflow-x: hidden;
+            margin-bottom: 0;
             margin-top: 0;
         }
         canvas { 
-            border: 1px solid white; 
-            border-radius: 2%;
+            border: 5px double white;
             padding-left: 0;
             padding-right: 0;
             margin-left: auto;
             margin-right: auto;
             display: block;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgb(0, 0, 0, 0.3)), url(fundo.jpg);
             background-color: rgba(30, 36, 30, 0.9);
+            background-size: cover;
         }    
     </style>
 </head>
@@ -39,7 +41,6 @@
                 this.owner = owner;
                 document.addEventListener("keydown", (event) => {
                     if(event.key == "Enter"){
-
                         document.getElementById("tela").requestFullscreen()
                     }
                     if (this.owner[event.code] && typeof( this.owner[event.code]) == "function" ){
@@ -131,6 +132,11 @@
             draw(timeStamp){
                 this.ctx.clearRect(0,0,800,600)
                 this.ctx.fillStyle = "white"
+                this.ctx.strokeStyle = "white"
+                this.ctx.beginPath()
+                this.ctx.rect(0,0,800,600)
+                this.ctx.stroke()
+
                 this.ctx.fillRect(this.obj.x, this.obj.y-37, this.obj.width, 10)
 
                 this.ctx.beginPath()
@@ -152,7 +158,22 @@
                 }
                 //this.ctx.drawImage(image, this.frame*width, 0, width, width, this.obj.x, this.obj.y-(37), width/2, width/2, width/2, width/2)
 
-                this.ctx.restore();                
+                this.ctx.restore();
+                let lwidth = 80
+                let lheight = 20
+                for (let i=0; i< 10; i++){
+                    this.ctx.beginPath()
+                    this.ctx.strokeStyle = "black"
+                    this.ctx.fillStyle = "red"
+                    this.ctx.rect(0, i*lheight, lwidth, lheight)
+                    this.ctx.rect(i * lwidth, i*lheight, lwidth, lheight)
+                    this.ctx.rect(i * lwidth, i*lheight, lwidth, lheight)
+                    this.ctx.rect(i * lwidth, i*lheight, lwidth, lheight)
+                    this.ctx.rect(i * lwidth, i*lheight, lwidth, lheight)
+                    this.ctx.fill()
+                    this.ctx.stroke()
+                }
+
                 //this.ctx.drawImage(image, this.frame*width, 0, width, width, this.obj.x, this.obj.y-(37), width/2, width/2, width/2, width/2)
                 //console.log(this.frame*width)
 
