@@ -29,6 +29,11 @@
     <script type='text/javascript'>
         document.write('<canvas id="tela" width="800" height="600"></canvas>');
 
+        const stage1 = [[2, 2, 1, 1, 1, 1, 1, 1, 2, 2],
+                        [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+                        [0, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+                        [0, 0, 0, 1, 1, 1, 1, 0, 0, 1]]
+
         /*Sprites*/
         var image = new Image();
             image.src = 'dino_walk_1.png';
@@ -62,7 +67,6 @@
                     }
                 }.bind(this)
                 document.addEventListener("onfocus", (event) => {
-                    //alert("saiu")
                     array.forEach(this.keys, (key)=> {
                         key = false
                     });
@@ -73,18 +77,50 @@
             }
         }        
 
+        class Brick{
+            constructor(canvasContext, ix, iy, type){
+                this.ctx = canvasContext;
+                this.width = 80;
+                this.height = 20;
+                this.shield = 1;
+                this.ix = ix;
+                this.iy = iy;
+                this.x = this.ix * this.width;
+                this.y = this.iy * this.height;
+                this.type = type;
+            }
+            draw(){
+                if (this.shield){
+                    this.ctx.strokeStyle = "black"
+                    this.ctx.fillStyle = "red"
+                    this.ctx.beginPath()
+                    this.ctx.rect(this.x, this.y, this.width, this.height)
+                    this.ctx.fill()
+                    this.ctx.stroke()
+                }
+            }
+        }
 
         class Arkanoid{
             constructor (canvasContext){
                 this.keys = []
                 this.ctx = canvasContext
-                this.ball = {x: 10, y: 20, vdir: 1, hdir: 1, velocity: 3}
-                this.obj = {x: 10, y: 580, width: 60}
+                this.ball = {x: 10, y: 20, vdir: 1, hdir: 1, velocityX: 3, velocityY: 3}
+                this.obj = {x: 10, y: 580-37, width: 60}
                 this.input = new Input(this)
                 this.frame = 0
             }
             
             run(){
+                this.bricks = []
+                for (let i = 0; i < stage1.length; i++) {
+                    for (let j = 0; j < stage1[i].length; j++) {
+                        if (stage1[i][j]){
+                            this.bricks.push(new Brick(this.ctx, j, i, stage1[i][j]))
+                        }
+                    }
+                }
+
                 setInterval(this.processAll.bind(this), 10)
                 setInterval(this.incFrame.bind(this), 150)
                 requestAnimationFrame(this.draw.bind(this))
@@ -101,20 +137,22 @@
                         this.obj.x+=5
                     }
                 }
-                this.ball.x += this.ball.vdir*this.ball.velocity
-                this.ball.y += this.ball.hdir*this.ball.velocity
+                this.ball.x += this.ball.hdir*this.ball.velocityX
+                this.ball.y += this.ball.vdir*this.ball.velocityY
                 if (this.ball.x <= 0){
-                    this.ball.vdir *= -1
+                    this.ball.hdir *= -1
                 }
                 if (this.ball.y <= 0){
-                    this.ball.hdir *= -1
-                }
-                if (this.ball.x >= 800){
                     this.ball.vdir *= -1
                 }
-                if (this.ball.y >= 600){
+                if (this.ball.x >= 800){
                     this.ball.hdir *= -1
                 }
+                if (this.ball.y >= 600){
+                    this.ball.vdir *= -1
+                }
+
+                this.checkCollision();
             }
 
             incFrame(){
@@ -137,47 +175,54 @@
                 this.ctx.rect(0,0,800,600)
                 this.ctx.stroke()
 
-                this.ctx.fillRect(this.obj.x, this.obj.y-37, this.obj.width, 10)
+                this.ctx.fillRect(this.obj.x, this.obj.y, this.obj.width, 10)
 
                 this.ctx.beginPath()
                 this.ctx.arc(this.ball.x, this.ball.y, 10, 0, 2 * Math.PI )
                 this.ctx.fill();
                 var width = 134
-                //var frame = 3
-                //this.ctx.drawImage(image, this.frame*width, 0, this.frame*width+width, width, 0, 0, 134, 134, 134, 134)
-                this.ctx.save();
-                //this.ctx.scale(1, -1);
-                //this.ctx.drawImage(img, 0, -img.height);
                 if (this.input.getKeys()['ArrowLeft'])
                 {
-                    this.ctx.drawImage(image2, this.frame*width, 0, width, width, this.obj.x, this.obj.y-(37), width/2, width/2, width/2, width/2)
+                    this.ctx.drawImage(image2, this.frame*width, 0, width, width, this.obj.x, this.obj.y, width/2, width/2, width/2, width/2)
                 }
                 else
                 {
-                    this.ctx.drawImage(image, this.frame*width, 0, width, width, this.obj.x, this.obj.y-(37), width/2, width/2, width/2, width/2)
-                }
-                //this.ctx.drawImage(image, this.frame*width, 0, width, width, this.obj.x, this.obj.y-(37), width/2, width/2, width/2, width/2)
-
-                this.ctx.restore();
-                let lwidth = 80
-                let lheight = 20
-                for (let i=0; i< 10; i++){
-                    this.ctx.beginPath()
-                    this.ctx.strokeStyle = "black"
-                    this.ctx.fillStyle = "red"
-                    this.ctx.rect(0, i*lheight, lwidth, lheight)
-                    this.ctx.rect(i * lwidth, i*lheight, lwidth, lheight)
-                    this.ctx.rect(i * lwidth, i*lheight, lwidth, lheight)
-                    this.ctx.rect(i * lwidth, i*lheight, lwidth, lheight)
-                    this.ctx.rect(i * lwidth, i*lheight, lwidth, lheight)
-                    this.ctx.fill()
-                    this.ctx.stroke()
+                    this.ctx.drawImage(image, this.frame*width, 0, width, width, this.obj.x, this.obj.y, width/2, width/2, width/2, width/2)
                 }
 
-                //this.ctx.drawImage(image, this.frame*width, 0, width, width, this.obj.x, this.obj.y-(37), width/2, width/2, width/2, width/2)
-                //console.log(this.frame*width)
+                for(let i = 0; i < this.bricks.length; i++){
+                    this.bricks[i].draw()
+                }
 
                 requestAnimationFrame(this.draw.bind(this))
+            }
+
+            checkCollision(){
+                for (let i = 0; i < this.bricks.length; i++){
+                    if (this.bricks[i].shield){
+                        if (this.ball.x >= this.bricks[i].x && (this.ball.x <= this.bricks[i].x+this.bricks[i].width) &&
+                            this.ball.y >= this.bricks[i].y && (this.ball.y <= this.bricks[i].y+this.bricks[i].height) ){
+                                this.ball.vdir *=-1
+                                this.bricks[i].shield--
+                        }
+                    }
+                }
+
+                if(this.ball.x >= this.obj.x && this.ball.x <= (this.obj.x+this.obj.width) && this.ball.y >= this.obj.y && this.ball.y <= (this.obj.y+10) ){
+                    this.ball.vdir *=-1
+                    //dependendo da região onde a bola acertar a "paleta", a velocidade horizontal assume um valor diferente
+                    // -100% a +100%
+                    let npercent = ((Math.abs(this.obj.x - this.ball.x) / this.obj.width) - 0.5)*2
+
+                    if ((npercent*100) > 0){
+                        this.ball.hdir = 1
+                    }
+                    else{
+                        this.ball.hdir = -1
+                    }
+                    this.ball.velocityX = 5*Math.abs(npercent)
+                                        
+                }
             }
         }
         var game = new Arkanoid(document.getElementById('tela').getContext("2d"))
