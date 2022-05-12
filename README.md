@@ -1,5 +1,5 @@
 
-# Joguinho Arkanoid - Estudos JS - Canvas
+# Joguinho Arkanoid - Estudos JS - Canvas:rocket:
 
 Repositório criado para estudo de JavaScript aplicado em jogo Arkanoid.
 
