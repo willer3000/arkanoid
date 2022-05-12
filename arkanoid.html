@@ -5,7 +5,9 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Page Title</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
+    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Acme&family=Lato:wght@100;300&family=Lobster&family=Shippori+Antique+B1&family=Simonetta&family=Titan+One&display=swap');
         body{
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.603), rgb(2, 68, 65)); 
             overflow-x: hidden;
@@ -22,10 +24,34 @@
             background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgb(0, 0, 0, 0.3)), url(fundo.jpg);
             background-color: rgba(30, 36, 30, 0.9);
             background-size: cover;
-        }    
+        }  
+        div{
+            margin-top: 20px;
+            float: left;
+        } 
+        a{
+         
+            text-decoration: none;
+            
+            color: white;
+            font-family: Lato, cursive;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.301);
+            font-weight:bolder;
+            font-size: large;  
+            border: 1px solid white; 
+            border-radius: 50%;     
+            padding: 10px;   
+            transition: .4s;
+        } 
+        a:hover{
+            color: rgb(12, 41, 12);
+            /*border-color:rgb(12, 41, 12) ;*/
+            
+        }
     </style>
 </head>
 <body>
+    <div><a href="index.html">MENU</a></div>
     <script type='text/javascript'>
         document.write('<canvas id="tela" width="800" height="600"></canvas>');
 
