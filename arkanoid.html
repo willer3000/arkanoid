@@ -9,51 +9,84 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Acme&family=Lato:wght@100;300&family=Lobster&family=Shippori+Antique+B1&family=Simonetta&family=Titan+One&display=swap');
         body{
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.603), rgb(2, 68, 65)); 
+            /*background: linear-gradient(to bottom, rgba(0, 0, 0, 0.603), rgb(2, 68, 65)); */
+            background: linear-gradient(rgb(6, 12, 59), rgb(44, 44, 114), green);
             overflow-x: hidden;
             margin-bottom: 0;
             margin-top: 0;
+            width: 100vw;
+            height: 100vh;
         }
-        canvas { 
+        .canvas { 
             border: 5px double white;
             padding-left: 0;
             padding-right: 0;
             margin-left: auto;
             margin-right: auto;
-            display: block;
+            display: none;
             background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgb(0, 0, 0, 0.3)), url(fundo.jpg);
             background-color: rgba(30, 36, 30, 0.9);
             background-size: cover;
-        }  
-        div{
-            margin-top: 20px;
-            float: left;
-        } 
-        a{
-         
-            text-decoration: none;
-            
-            color: white;
-            font-family: Lato, cursive;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.301);
-            font-weight:bolder;
-            font-size: large;  
-            border: 1px solid white; 
-            border-radius: 50%;     
-            padding: 10px;   
-            transition: .4s;
-        } 
-        a:hover{
-            color: rgb(12, 41, 12);
-            /*border-color:rgb(12, 41, 12) ;*/
-            
         }
+
+        .splash{
+            border: 5px double white;
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: flex;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgb(0, 0, 0, 0.3)), url(fundo.jpg);
+            background-color: rgba(30, 36, 30, 0.9);
+            background-size: cover;
+            width: 800px;
+            height: 600px;
+            justify-content: center;
+            align-items: center;
+        }
+        .splash-content{
+            display: block;
+        }
+        .splash-jogar{
+            background-color: rgb(134, 209, 187);
+            transition: .4s;
+        }
+        .splash-jogar:hover{
+            background-color: rgb(1, 20, 14);
+        }
+        strong {
+            text-decoration: none;
+            color: rgb(5, 13, 54);  
+            font-family: Shippori Antique B1;   
+            transition: .4s;
+            display: block;
+            cursor: pointer;
+        }
+        strong:hover{
+            color: rgb(241, 241, 241);
+            font-weight:bolder;
+        }
+
+        h1 {
+            color: rgb(226, 209, 209);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.76);
+            font-size: 90px;
+            font-family: 'Titan One', cursive;
+            margin-bottom: 20px;
+        }        
+
     </style>
 </head>
 <body>
-    <div><a href="index.html">MENU</a></div>
+    <div class="splash">
+        <div class="splash-content">
+            <h1>Arkanoid</h1>
+            <center><div class="splash-jogar" onclick="jogar()"><strong>JOGAR</strong></div></center>
+        </div>
+    </div>
+
     <script type='text/javascript'>
-        document.write('<canvas id="tela" width="800" height="600"></canvas>');
+        document.write('<canvas id="tela" class="canvas" width="800" height="600"></canvas>');
 
         const stage1 = [[2, 2, 1, 1, 1, 1, 1, 1, 2, 2],
                         [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
@@ -255,7 +288,13 @@
             }
         }
         var game = new Arkanoid(document.getElementById('tela').getContext("2d"))
-        game.run();
+        //game.run();
+
+        function jogar(){
+            document.getElementsByClassName('splash')[0].style.display = 'none';
+            document.getElementsByClassName('canvas')[0].style.display = 'block';
+            game.run();
+        }
     </script>    
 </body>
 </html>
