@@ -39,6 +39,8 @@
             image.src = 'dino_walk_1.png';
         var image2 = new Image();
             image2.src = 'dino_walk_2.png';
+        var imageBricks = new Image();
+            imageBricks.src = 'bricks.png';
 
         class Input {
             constructor(owner){
@@ -78,25 +80,22 @@
         }        
 
         class Brick{
-            constructor(canvasContext, ix, iy, type){
+            constructor(canvasContext, ix, iy, type, totalShield){
                 this.ctx = canvasContext;
                 this.width = 80;
                 this.height = 20;
-                this.shield = 1;
+                this.shield = 2;
                 this.ix = ix;
                 this.iy = iy;
                 this.x = this.ix * this.width;
                 this.y = this.iy * this.height;
                 this.type = type;
+                this.totalShield = 2;
             }
             draw(){
                 if (this.shield){
-                    this.ctx.strokeStyle = "black"
-                    this.ctx.fillStyle = "red"
-                    this.ctx.beginPath()
-                    this.ctx.rect(this.x, this.y, this.width, this.height)
-                    this.ctx.fill()
-                    this.ctx.stroke()
+
+                    this.ctx.drawImage(imageBricks, 0, (this.totalShield-this.shield) * this.height, this.width, this.height, this.x, this.y, this.width, this.height)
                 }
             }
         }
@@ -179,7 +178,11 @@
 
                 this.ctx.beginPath()
                 this.ctx.arc(this.ball.x, this.ball.y, 10, 0, 2 * Math.PI )
+                this.ctx.strokeStyle = "black"
+                this.ctx.stroke();
+
                 this.ctx.fill();
+
                 var width = 134
                 if (this.input.getKeys()['ArrowLeft'])
                 {
