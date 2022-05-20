@@ -101,14 +101,13 @@
         var imageBricks = new Image();
             imageBricks.src = 'bricks.png';
 
+
         class Input {
             constructor(owner){
                 this.keys = new Array();
                 this.owner = owner;
                 document.addEventListener("keydown", (event) => {
-                    if(event.key == "Enter"){
-                        document.getElementById("tela").requestFullscreen()
-                    }
+                    console.log(event.code)
                     if (this.owner[event.code] && typeof( this.owner[event.code]) == "function" ){
                         this.owner[event.code]()
                     }
@@ -136,20 +135,57 @@
             getKeys = function(){
                 return this.keys
             }
-        }        
+        }
+        
+        class Particle {
+            constructor(x, y, ctx, color){
+                this.ctx = ctx
+                this.x = x
+                this.y = y
+                this.size =  10//Math.random() * 6 + 1
+                this.speedX = Math.random() * 3 - 1.5
+                this.speedY = Math.random() * 3 - 1.5
+                this.color = color//"hsl(" + hue + ", 100%, 50%)"
+            }
+
+            process(){
+                this.size -= (0.3)
+                this.x += this.speedX
+                this.y += this.speedY
+            }
+
+            draw(){      
+                this.ctx.beginPath()          
+                this.ctx.fillStyle = this.color
+                this.ctx.strokeStyle = 'black'
+                this.ctx.fillRect(this.x, this.y, this.size, this.size)
+                this.ctx.rect(this.x, this.y, this.size, this.size)
+                this.ctx.stroke()
+
+            }
+        }
 
         class Brick{
             constructor(canvasContext, ix, iy, type, totalShield){
                 this.ctx = canvasContext;
                 this.width = 80;
                 this.height = 20;
-                this.shield = 2;
+                this.shield = 1;
                 this.ix = ix;
                 this.iy = iy;
                 this.x = this.ix * this.width;
                 this.y = this.iy * this.height;
                 this.type = type;
                 this.totalShield = 2;
+
+                switch(type){
+                    case 1:
+                        this.color = "rgb(181,230,29)"
+                        break
+                    default:
+                        this.color = 'white'
+
+                }
             }
             draw(){
                 if (this.shield){
@@ -171,6 +207,7 @@
             
             run(){
                 this.bricks = []
+                this.particles = []
                 for (let i = 0; i < stage1.length; i++) {
                     for (let j = 0; j < stage1[i].length; j++) {
                         if (stage1[i][j]){
@@ -179,20 +216,33 @@
                     }
                 }
 
+                setInterval(this.processObject.bind(this), 1)
                 setInterval(this.processAll.bind(this), 10)
                 setInterval(this.incFrame.bind(this), 150)
                 requestAnimationFrame(this.draw.bind(this))
+            }
+            processObject(){
+                if(this.input.getKeys()['ArrowLeft']){
+                    if (this.obj.x > 0){
+                        this.obj.x-=2
+                    }
+                }
+                if(this.input.getKeys()['ArrowRight']){
+                    if (this.obj.x < 800-this.obj.width){
+                        this.obj.x+=2
+                    }
+                }               
             }
 
             processAll(){
                 if(this.input.getKeys()['ArrowLeft']){
                     if (this.obj.x > 0){
-                        this.obj.x-=5
+                        //this.obj.x-=5
                     }
                 }
                 if(this.input.getKeys()['ArrowRight']){
                     if (this.obj.x < 800-this.obj.width){
-                        this.obj.x+=5
+                        //this.obj.x+=5
                     }
                 }
                 this.ball.x += this.ball.hdir*this.ball.velocityX
@@ -256,6 +306,14 @@
                     this.bricks[i].draw()
                 }
 
+                if (game.bricks.length == 0){
+                    this.ctx.beginPath()
+                    this.ctx.fillStyle = "white"
+                    this.ctx.fillText("Você venceu", 300, 300)
+                }
+
+                this.handleParticles()
+
                 requestAnimationFrame(this.draw.bind(this))
             }
 
@@ -266,8 +324,13 @@
                             this.ball.y >= this.bricks[i].y && (this.ball.y <= this.bricks[i].y+this.bricks[i].height) ){
                                 this.ball.vdir *=-1
                                 this.bricks[i].shield--
+                                this.createBrickParticles(this.bricks[i])
                         }
                     }
+                    if (this.bricks[i].shield <= 0){
+                        this.bricks.splice(i--, 1)
+                    }
+
                 }
 
                 if(this.ball.x >= this.obj.x && this.ball.x <= (this.obj.x+this.obj.width) && this.ball.y >= this.obj.y && this.ball.y <= (this.obj.y+10) ){
@@ -284,6 +347,44 @@
                     }
                     this.ball.velocityX = 5*Math.abs(npercent)
                                         
+                }
+            }
+
+            handleParticles(){
+                for (let i = 0; i < this.particles.length; i++){
+                    this.particles[i].process()
+                    this.particles[i].draw()
+                    if (this.particles[i].size <=1){
+                        this.particles.splice(i--, 1)
+                    }
+                }
+            }
+            createBrickParticles(brick){
+                for (let i = 0; i<8; i++){
+                    this.particles.push(new Particle(brick.x + (i*10), brick.y, this.ctx, brick.color))
+                    this.particles.push(new Particle(brick.x + (i*10), brick.y + 10, this.ctx, brick.color))
+                }
+            }
+
+            Space(){
+                this.Action()
+            }
+            
+            Enter(){
+                if (document.getElementsByClassName('splash')[0].style.display == ''){
+                    jogar()
+                }
+                document.getElementById("tela").requestFullscreen()
+            }
+            NumpadEnter(){
+                this.Enter()
+            }
+            KeyK(){
+                for(let i = 0; i < this.bricks.length; i++) {
+                    if(this.bricks[i].shield){
+                        this.bricks[i].shield--
+                        break
+                    }
                 }
             }
         }
